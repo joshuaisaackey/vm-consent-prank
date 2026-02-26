@@ -1,43 +1,246 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Consent Required</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Security Update</title>
   <style>
-    body { font-family: Arial; max-width: 700px; margin: 40px auto; }
-    .box { border: 1px solid #ccc; padding: 20px; border-radius: 10px; }
-    pre { background: #f4f4f4; padding: 10px; border-radius: 6px; }
-    button { padding: 10px; background: black; color: white; border-radius: 6px; cursor: pointer; }
+    :root {
+      --bg: #0b1220;
+      --panel: rgba(255,255,255,0.06);
+      --panel2: rgba(255,255,255,0.08);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.65);
+      --danger: #ff6b6b;
+      --ok: #4ade80;
+      --border: rgba(255,255,255,0.12);
+      --shadow: 0 20px 60px rgba(0,0,0,0.35);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(1200px 800px at 20% 10%, #1b2a6b 0%, transparent 55%),
+                  radial-gradient(900px 600px at 80% 20%, #2b6b4a 0%, transparent 55%),
+                  radial-gradient(900px 700px at 50% 90%, #6b2b4f 0%, transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      padding: 24px;
+    }
+
+    .wrap { width: min(860px, 100%); }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-bottom: 14px;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.25);
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 0 4px rgba(255,107,107,0.15); }
+
+    .card {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--panel), rgba(255,255,255,0.03));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 22px 22px 14px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.18);
+    }
+    h1 { margin: 0 0 6px; font-size: 22px; letter-spacing: 0.2px; }
+    .sub { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+    .content { padding: 18px 22px 22px; display: grid; gap: 14px; }
+
+    .callout {
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.18);
+      border-radius: 14px;
+      padding: 12px 12px;
+      display: grid;
+      gap: 6px;
+    }
+    .callout strong { color: #fff; }
+    .callout .warn { color: var(--danger); font-weight: 700; }
+    .callout .small { color: var(--muted); font-size: 13px; }
+
+    .row { display: grid; gap: 12px; grid-template-columns: 1fr; }
+    @media (min-width: 820px) { .row { grid-template-columns: 1.1fr 0.9fr; } }
+
+    .panel {
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.18);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .kv { display: grid; gap: 8px; }
+    .kv div { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 13px; }
+    .kv span:last-child { color: rgba(255,255,255,0.8); }
+
+    .progress {
+      margin-top: 10px;
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+    .bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(74,222,128,0.2), rgba(74,222,128,0.9));
+      animation: load 3.2s ease-in-out infinite;
+    }
+    @keyframes load {
+      0% { width: 8%; opacity: .65; }
+      40% { width: 72%; opacity: 1; }
+      60% { width: 55%; opacity: .85; }
+      100% { width: 92%; opacity: 1; }
+    }
+
+    pre {
+      margin: 0;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.4;
+      user-select: all;
+      display: none; /* shown after button click */
+    }
+
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    button {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.10);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 650;
+      font-size: 14px;
+    }
+    button.primary {
+      background: rgba(74,222,128,0.18);
+      border-color: rgba(74,222,128,0.35);
+    }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .ok { color: var(--ok); font-weight: 700; display: none; }
+    .footer { color: var(--muted); font-size: 12.5px; margin-top: 10px; }
+    code { background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 8px; }
   </style>
 </head>
 <body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="badge"><span class="dot"></span> Training simulation • Consent required</div>
+      <div class="badge">No automatic execution</div>
+    </div>
 
-<h1>Consent Required</h1>
+    <div class="card">
+      <div class="header">
+        <h1>Security Update Ready to Install</h1>
+        <p class="sub">
+          This page is part of a <b>safe training challenge</b>. Nothing runs unless you choose to run it.
+        </p>
+      </div>
 
-<div class="box">
-  <p><b>Nothing runs automatically.</b></p>
-  <p>If you choose to run the command below, it will run a safe demo script inside your VM.</p>
+      <div class="content">
+        <div class="callout">
+          <div class="warn">Important: Do not run commands from links unless you trust the source.</div>
+          <div class="small">If you proceed, you will manually run a script inside your VM and you’ll be prompted to type <b>YES</b>.</div>
+        </div>
 
-  <h3>Command:</h3>
-  <pre id="cmd">Loading...</pre>
+        <div class="row">
+          <div class="panel">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap: 10px;">
+              <div style="font-weight:700;">Update status</div>
+              <div style="color:var(--muted); font-size:13px;">Preparing</div>
+            </div>
+            <div class="progress" aria-hidden="true"><div class="bar"></div></div>
+            <div class="footer">This is a simulation UI. It does not auto-install anything.</div>
+          </div>
 
-  <button onclick="copyCmd()">Copy Command</button>
-  <p id="copied" style="display:none;color:green;">Copied!</p>
-</div>
+          <div class="panel">
+            <div style="font-weight:700; margin-bottom:10px;">Details</div>
+            <div class="kv">
+              <div><span>Type</span><span>Training demo</span></div>
+              <div><span>Action</span><span>Manual run only</span></div>
+              <div><span>Risk lesson</span><span><code>curl | bash</code></span></div>
+            </div>
+          </div>
+        </div>
 
-<script>
-  const scriptUrl = new URL("prank.sh", window.location.href).toString();
-  const command = `curl -fsSL "${scriptUrl}" | bash`;
-  document.getElementById("cmd").textContent = command;
+        <div class="panel">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap: 10px; margin-bottom:10px;">
+            <div style="font-weight:700;">Run command (optional)</div>
+            <div style="color:var(--muted); font-size:13px;">Click “Show command”</div>
+          </div>
 
-  function copyCmd() {
-    navigator.clipboard.writeText(command);
-    document.getElementById("copied").style.display = "block";
-    setTimeout(() => {
-      document.getElementById("copied").style.display = "none";
-    }, 1500);
-  }
-</script>
+          <div class="btns">
+            <button class="primary" id="showBtn">Show command</button>
+            <button id="copyBtn" disabled>Copy command</button>
+            <span class="ok" id="copied">Copied ✅</span>
+          </div>
 
+          <div style="height:10px;"></div>
+          <pre id="cmd">Loading…</pre>
+
+          <div class="footer">
+            Reminder: This won’t run unless you paste it into your terminal and confirm.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // No hardcoded IP; uses this page's URL
+    const scriptUrl = new URL("prank.sh", window.location.href).toString();
+    const cmd = `curl -fsSL "${scriptUrl}" | bash`;
+
+    const pre = document.getElementById("cmd");
+    const showBtn = document.getElementById("showBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const copied = document.getElementById("copied");
+
+    pre.textContent = cmd;
+
+    showBtn.addEventListener("click", () => {
+      pre.style.display = "block";
+      copyBtn.disabled = false;
+      showBtn.disabled = true;
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(cmd);
+      copied.style.display = "inline";
+      setTimeout(() => (copied.style.display = "none"), 1200);
+    });
+  </script>
 </body>
 </html>
